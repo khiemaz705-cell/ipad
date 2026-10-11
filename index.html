@@ -2,6 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
+    <!-- Tối ưu hiển thị, khóa phóng to thu nhỏ giúp giao diện giống ứng dụng trên iPad 2 -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Karaoke iPad 2</title>
     
@@ -16,6 +17,8 @@
         h1 {
             color: #333;
             font-size: 28px;
+            margin-top: 10px;
+            margin-bottom: 20px;
         }
         #player-container {
             background-color: #fff;
@@ -51,7 +54,9 @@
             border-radius: 8px;
             cursor: pointer;
             text-align: left;
+            /* Tối ưu hóa phản hồi chạm cho iOS cũ không bị trễ 300ms */
             touch-action: manipulation; 
+            -webkit-tap-highlight-color: rgba(0,0,0,0);
         }
         .song-item:active {
             background-color: #dcdcdc;
@@ -61,38 +66,45 @@
 <body>
 
     <h1>KARAOKE IPAD 2</h1>
-<li class="song-item" onclick="playSong('music/tapyeudi.mp3', 'Tập Yêu Đi')">
 
     <div id="player-container">
         <div id="current-title">Chưa chọn bài hát</div>
-        <!-- Thay đổi quan trọng cho iOS 9: Bật tự động tải trước cấu trúc nhạc bằng cách bỏ preload="none" -->
-        <audio id="my-audio" controls>
+        <!-- Sử dụng thuộc tính chuẩn, loại bỏ các cài đặt gây lỗi nạp nhạc cho iOS 9 -->
+        <audio id="my-audio" controls preload="auto">
             Trình duyệt của bạn không hỗ trợ nghe nhạc.
         </audio>
     </div>
 
     <ul class="song-list">
-        <!-- Chỉnh sửa cách gọi nhạc: Truyền trực tiếp đường dẫn gốc rõ ràng hơn -->
-        <li class="song-item" onclick="playSong('./music/tapyeudi.mp3', 'Tập Yêu Đi')">
+        <!-- Đã sửa đường dẫn file nhạc gọn gàng, đưa thẳng ra thư mục gốc để tránh lỗi GitHub -->
+        <li class="song-item" onclick="playSong('tapyeudi.mp3', 'Tập Yêu Đi')">
             🎵 Tập Yêu Đi
         </li>
     </ul>
 
     <script>
+        // Sử dụng biến var để tương thích tuyệt đối với trình duyệt cũ của iOS 9
         var audioPlayer = document.getElementById('my-audio');
         var currentTitle = document.getElementById('current-title');
 
         function playSong(songUrl, songName) {
             currentTitle.innerHTML = "Đang phát: " + songName;
             
-            // Xử lý đặc biệt cho Safari iOS 9: Thiết lập lại thuộc tính nguồn trực tiếp
-            audioPlayer.setAttribute('src', songUrl);
+            // Cách nạp nguồn chuẩn xác và an toàn nhất cho Safari iOS cũ
+            audioPlayer.src = songUrl;
             
-            // Ép trình duyệt đọc lại file âm thanh
+            // Buộc trình duyệt nạp lại dữ liệu âm thanh mới lập tức
             audioPlayer.load();
             
-            // Chạy lệnh phát nhạc
-            audioPlayer.play();
+            // Kích hoạt phát nhạc trực tiếp từ sự kiện click của người dùng
+            var playPromise = audioPlayer.play();
+            
+            // Đoạn mã phòng ngừa để tránh lỗi crash script trên các trình duyệt cũ hỗ trợ Promise
+            if (playPromise !== undefined) {
+                playPromise.catch(function(error) {
+                    console.log("Kích hoạt phát nhạc thất bại:", error);
+                });
+            }
         }
     </script>
 
