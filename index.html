@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <!-- Đoạn này giúp giao diện vừa vặn với màn hình iPad và không bị tự động thu nhỏ -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Karaoke iPad 2</title>
+    
+    <style>
+        /* Phong cách thiết kế chữ lớn, nút to tối ưu cho màn hình cảm ứng cũ của iPad 2 */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+            font-size: 28px;
+        }
+        /* Khu vực hiển thị thông tin bài hát đang phát */
+        #player-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        #current-title {
+            font-size: 22px;
+            font-weight: bold;
+            color: #007aff;
+            margin-bottom: 15px;
+        }
+        /* Trình phát nhạc mặc định của hệ thống */
+        audio {
+            width: 100%;
+            max-width: 500px;
+            margin-top: 10px;
+        }
+        /* Danh sách bài hát */
+        .song-list {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 0;
+            list-style: none;
+        }
+        /* Từng dòng bài hát biến thành một nút bấm lớn dễ chạm bằng ngón tay */
+        .song-item {
+            background-color: #ffffff;
+            margin-bottom: 12px;
+            padding: 20px;
+            font-size: 20px;
+            font-weight: bold;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: left;
+            /* Chặn việc người dùng chạm đúp làm phóng to màn hình ngoài ý muốn */
+            touch-action: manipulation; 
+        }
+        /* Hiệu ứng đổi màu nhẹ khi nhấn giữ (active) trên màn hình cảm ứng */
+        .song-item:active {
+            background-color: #dcdcdc;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>KARAOKE IPAD 2</h1>
+
+    <div id="player-container">
+        <div id="current-title">Chưa chọn bài hát</div>
+        <!-- Thẻ audio tiêu chuẩn từ thời iOS 9 giúp chạy nhạc trực tiếp ổn định -->
+        <audio id="my-audio" controls preload="none">
+            Trình duyệt của bạn quá cũ không hỗ trợ nghe nhạc.
+        </audio>
+    </div>
+
+    <!-- Danh sách bài hát để chọn -->
+    <ul class="song-list">
+        <!-- Khi bấm vào bài này, nó sẽ gọi hàm phát nhạc và truyền tên file nhạc vào -->
+        <li class="song-item" onclick="playSong('music/tapyeudi.mp3', 'Tập Yêu Đi')">
+            🎵 Tập Yêu Đi
+        </li>
+    </ul>
+
+    <script>
+        // Lấy các thành phần giao diện ra để JavaScript điều khiển
+        var audioPlayer = document.getElementById('my-audio');
+        var currentTitle = document.getElementById('current-title');
+
+        // Hàm xử lý khi người dùng chạm vào một bài hát
+        function playSong(songUrl, songName) {
+            // 1. Cập nhật tên bài hát đang phát lên màn hình
+            currentTitle.innerHTML = "Đang phát: " + songName;
+            
+            // 2. Thay đổi đường dẫn file nhạc của trình phát
+            audioPlayer.src = songUrl;
+            
+            // 3. Ra lệnh tải file nhạc này về
+            audioPlayer.load();
+            
+            // 4. Ra lệnh phát nhạc
+            audioPlayer.play();
+        }
+    </script>
+
+</body>
+</html>
