@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Music Player iPad 2</title>
     <style>
-        /* Tối ưu hóa CSS thuần, không hiệu ứng nặng, phù hợp màn hình 1024x768 */
+        /* Tối ưu hóa CSS thuần, không hiệu ứng nặng, phù hợp phần cứng cũ của iPad 2 */
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: #000000;
@@ -28,7 +28,7 @@
             margin-bottom: 25px;
         }
 
-        /* Khung phát nhạc tối giản giống giao diện Apple Music cổ điển */
+        /* Khung phát nhạc tối giản giống giao diện Apple Music */
         .now-playing-card {
             background-color: #1c1c1e;
             border-radius: 12px;
@@ -82,7 +82,7 @@
             justify-content: space-between;
             align-items: center;
             border: 1px solid #2c2c2e;
-            /* Tối ưu hóa tốc độ phản hồi phản hồi cảm ứng trên iOS cũ */
+            /* Tối ưu hóa tốc độ phản hồi cảm ứng trên iOS cũ */
             -webkit-tap-highlight-color: rgba(255,255,255,0.05);
         }
 
@@ -143,21 +143,22 @@
 </div>
 
 <script>
-    // Mảng dữ liệu bài hát - Nơi bạn dễ dàng thêm/sửa/xóa nhạc
+    // MẠNG DỮ LIỆU BÀI HÁT - Nơi bạn quản lý nhạc của mình
+    // Hãy thay thế link ".mp3" bạn lấy được từ archive.org vào phần url bên dưới.
     var myPlaylist = [
         {
             title: "Tập Yêu Đi",
             artist: "Ca Sĩ Trình Bày",
-            url: "https://archive.org" // Thay link archive của bạn vào đây
+            url: "https://archive.org" 
         },
         {
-            title: "Bài hát mẫu 2",
-            artist: "Nghệ Sĩ A",
+            title: "Bài hát thử nghiệm 2",
+            artist: "SoundHelix Sample",
             url: "https://soundhelix.com"
         },
         {
-            title: "Bài hát mẫu 3",
-            artist: "Nghệ Sĩ B",
+            title: "Bài hát thử nghiệm 3",
+            artist: "SoundHelix Sample",
             url: "https://soundhelix.com"
         }
     ];
@@ -167,7 +168,7 @@
     var artistNode = document.getElementById('track-artist');
     var listContainer = document.getElementById('playlist-container');
 
-    // Hàm render danh sách bài hát ra màn hình iPad
+    // Hàm xuất danh sách bài hát ra màn hình
     function renderPlaylist() {
         listContainer.innerHTML = "";
         for (var i = 0; i < myPlaylist.length; i++) {
@@ -198,7 +199,7 @@
             li.appendChild(infoDiv);
             li.appendChild(statusDiv);
             
-            // Xử lý sự kiện bấm chọn bài hát bằng Closure tương thích JS cũ
+            // Bắt sự kiện bấm chọn bài hát (Tương thích tốt JS cũ)
             li.onclick = (function(index) {
                 return function() {
                     playTrack(index);
@@ -209,28 +210,28 @@
         }
     }
 
-    // Hàm thực hiện phát nhạc và quản lý bộ nhớ RAM cho iPad 2
+    // Hàm thực hiện đổi bài hát và chủ động giải phóng bộ nhớ RAM cho iPad 2
     function playTrack(index) {
         var track = myPlaylist[index];
         
         titleNode.innerHTML = track.title;
         artistNode.innerHTML = track.artist;
         
-        // 1. Dừng trình phát hiện tại
+        // 1. Dừng bài hát hiện tại lại
         audioNode.pause();
         
-        // 2. Ép giải phóng bộ nhớ đệm bài hát cũ (Rất quan trọng trên iOS 9)
+        // 2. Xóa sạch nguồn nhạc cũ để ép Safari giải phóng RAM đệm ngay lập tức
         audioNode.src = ""; 
         audioNode.load();
         
-        // 3. Nạp đường dẫn bài mới
+        // 3. Nạp đường dẫn bài hát mới vào và tải
         audioNode.src = track.url;
         audioNode.load();
         
-        // 4. Tiến hành phát
+        // 4. Phát nhạc
         audioNode.play();
         
-        // Cập nhật hiệu ứng hiển thị bài đang chọn trong danh sách
+        // Cập nhật giao diện làm nổi bật bài đang được chọn
         var items = listContainer.getElementsByClassName('song-item');
         for (var i = 0; i < items.length; i++) {
             items[i].className = 'song-item';
@@ -240,15 +241,14 @@
         }
     }
 
-    // Tự động chuyển bài tiếp theo khi bài hát hiện tại kết thúc
+    // Tự động chuyển sang bài tiếp theo khi bài hiện tại hát xong
     audioNode.addEventListener('ended', function() {
-        // Tìm xem bài hiện tại đang ở vị trí số mấy
         var activeItem = listContainer.getElementsByClassName('active-track')[0];
         if (activeItem) {
             var currentIndex = parseInt(activeItem.getAttribute('data-index'));
             var nextIndex = currentIndex + 1;
             
-            // Nếu chưa hết danh sách thì phát bài tiếp theo, nếu hết thì quay về bài đầu
+            // Nếu chưa hết danh sách thì qua bài mới, nếu hết thì lặp lại từ bài đầu tiên
             if (nextIndex < myPlaylist.length) {
                 playTrack(nextIndex);
             } else {
@@ -257,7 +257,7 @@
         }
     });
 
-    // Chạy khởi tạo ứng dụng khi tải xong trang
+    // Chạy khởi tạo ứng dụng khi tải xong trang web
     window.onload = renderPlaylist;
 </script>
 
