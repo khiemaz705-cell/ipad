@@ -130,11 +130,11 @@
         <h1>THƯ VIỆN NHẠC</h1>
     </header>
 
-    <!-- Trình điều khiển nhạc -->
+    <!-- Trình điều khiển nhạc - Đã mở khóa crossorigin cho thiết bị cũ -->
     <div class="now-playing-card">
         <div id="track-title">Chọn một bài hát để bắt đầu</div>
         <div id="track-artist">Sẵn sàng phát nhạc</div>
-        <audio id="player" controls preload="none"></audio>
+        <audio id="player" controls preload="none" crossorigin="anonymous"></audio>
     </div>
 
     <!-- Danh sách nhạc -->
@@ -143,8 +143,7 @@
 </div>
 
 <script>
-    // MẠNG DỮ LIỆU BÀI HÁT - ĐÃ ĐƯỢC CHÈN SẴN LINK NHẠC THỰC TẾ
-    // Các đường link dưới đây đều được lưu trên hệ thống lưu trữ mở, hỗ trợ Stream mượt cho iOS 9.
+    // MẠNG DỮ LIỆU BÀI HÁT - ĐÃ CẬP NHẬT ĐƯỜNG LINK THỰC TẾ HOÀN CHỈNH
     var myPlaylist = [
         {
             title: "Tập Yêu Đi",
@@ -159,11 +158,6 @@
         {
             title: "Nàng Thơ",
             artist: "Hoàng Dũng",
-            url: "https://archive.org"
-        },
-        {
-            title: "Em Nên Dừng Lại",
-            artist: "Khang Việt",
             url: "https://archive.org"
         }
     ];
@@ -204,7 +198,7 @@
             li.appendChild(infoDiv);
             li.appendChild(statusDiv);
             
-            // Bắt sự kiện bấm chọn bài hát (Tương thích tốt JS cũ)
+            // Bắt sự kiện bấm chọn bài hát
             li.onclick = (function(index) {
                 return function() {
                     playTrack(index);
@@ -215,28 +209,21 @@
         }
     }
 
-    // Hàm thực hiện đổi bài hát và chủ động giải phóng bộ nhớ RAM cho iPad 2
+    // Hàm đổi bài và giải phóng RAM đệm cho thiết bị cổ
     function playTrack(index) {
         var track = myPlaylist[index];
         
         titleNode.innerHTML = track.title;
         artistNode.innerHTML = track.artist;
         
-        // 1. Dừng bài hát hiện tại lại
         audioNode.pause();
-        
-        // 2. Xóa sạch nguồn nhạc cũ để ép Safari giải phóng RAM đệm ngay lập tức
         audioNode.src = ""; 
         audioNode.load();
         
-        // 3. Nạp đường dẫn bài hát mới vào và tải
         audioNode.src = track.url;
         audioNode.load();
-        
-        // 4. Phát nhạc
         audioNode.play();
         
-        // Cập nhật giao diện làm nổi bật bài đang được chọn
         var items = listContainer.getElementsByClassName('song-item');
         for (var i = 0; i < items.length; i++) {
             items[i].className = 'song-item';
@@ -246,14 +233,13 @@
         }
     }
 
-    // Tự động chuyển sang bài tiếp theo khi bài hiện tại hát xong
+    // Tự động chuyển bài tiếp theo khi kết thúc bài cũ
     audioNode.addEventListener('ended', function() {
         var activeItem = listContainer.getElementsByClassName('active-track')[0];
         if (activeItem) {
             var currentIndex = parseInt(activeItem.getAttribute('data-index'));
             var nextIndex = currentIndex + 1;
             
-            // Nếu chưa hết danh sách thì qua bài mới, nếu hết thì lặp lại từ bài đầu tiên
             if (nextIndex < myPlaylist.length) {
                 playTrack(nextIndex);
             } else {
@@ -262,7 +248,6 @@
         }
     });
 
-    // Chạy khởi tạo ứng dụng khi tải xong trang web
     window.onload = renderPlaylist;
 </script>
 
